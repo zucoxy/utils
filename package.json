@@ -22,10 +22,6 @@
       "types": "./index.d.ts",
       "require": "./dist/index.js",
       "import": "./dist/index.mjs"
-    },
-    "./*": {
-      "require": "./dist/*.js",
-      "import": "./dist/*.mjs"
     }
   },
   "files": [
@@ -62,5 +58,5 @@
       ]
     }
   },
-  "version": "0.0.5"
+  "version": "0.0.6"
 }
