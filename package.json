@@ -18,45 +18,37 @@
     "vitest": "^0.25.3"
   },
   "exports": {
-    ".": {
-      "types": "./index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.mjs"
-    }
+    "require": "./dist/index.js",
+    "import": "./dist/index.mjs"
   },
   "files": [
-    "dist",
-    "*.d.ts"
+    "dist"
   ],
   "homepage": "https://github.com/zucoxy/utils#readme",
   "keywords": [
     "utils"
   ],
   "license": "MIT",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
   "name": "@unyu/utils",
+  "publishConfig": {
+    "access": "public"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zucoxy/utils.git"
   },
   "scripts": {
     "dev": "tsup src/index.ts",
-    "build": "tsup",
+    "build-fast": "tsup src/index.ts --format cjs,esm",
+    "build": "pnpm run build-fast -- --dts-resolve",
     "start": "esno src/index.ts",
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --fix",
     "prettier": "prettier --write .",
-    "release": "bumpp --commit --push --tag && npm publish --access public"
+    "release": "bumpp --commit --push --tag && npm publish"
   },
-  "type": "module",
-  "types": "dist/index.d.ts",
-  "typesVersions": {
-    "*": {
-      ".": [
-        "./dist/index.d.ts"
-      ]
-    }
-  },
-  "version": "0.0.6"
+  "types": "./dist/index.d.ts",
+  "version": "0.0.7"
 }
