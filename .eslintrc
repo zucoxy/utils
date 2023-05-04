@@ -1,0 +1,11 @@
+{
+  "root": true,
+  "extends": "@unyu",
+  "plugins": ["@typescript-eslint", "prettier"],
+  "rules": {
+    "@typescript-eslint/semi": "off",
+    "no-mixed-operators": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "@typescript-eslint/prefer-ts-expect-error": "off"
+  }
+}

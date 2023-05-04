@@ -1,0 +1,25 @@
+# 忽略格式化文件 (根据项目需要自行添加)
+*.sh
+node_modules
+*.md
+*.woff
+*.ttf
+.vscode
+.idea
+dist
+.husky
+**/*.svg
+**/*.sh
+locales/**
+
+env.d.ts
+auto-imports.d.ts
+components.d.ts
+.eslintrc.js
+.eslintrc.cjs
+.prettierrc.js
+.prettierrc.json
+.versionrc.js
+stats.html
+pnpm-lock.yaml
+.eslintrc-auto-import.json
