@@ -47,7 +47,7 @@
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --fix",
     "prettier": "prettier --write .",
-    "release": "bumpp --commit --push --tag && npm publish"
+    "release": "bumpp --commit --push --tag && npm publish --access public"
   },
   "type": "module",
   "types": "index.d.ts",
