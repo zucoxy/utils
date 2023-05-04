@@ -20,8 +20,12 @@
   "exports": {
     ".": {
       "types": "./index.d.ts",
-      "require": "./dist/index.cjs",
+      "require": "./dist/index.js",
       "import": "./dist/index.mjs"
+    },
+    "./*": {
+      "require": "./dist/*.js",
+      "import": "./dist/*.mjs"
     }
   },
   "files": [
@@ -33,7 +37,7 @@
     "utils"
   ],
   "license": "MIT",
-  "main": "dist/index.cjs",
+  "main": "dist/index.js",
   "module": "dist/index.mjs",
   "name": "@unyu/utils",
   "repository": {
@@ -50,6 +54,13 @@
     "release": "bumpp --commit --push --tag && npm publish --access public"
   },
   "type": "module",
-  "types": "index.d.ts",
-  "version": "0.0.3"
+  "types": "dist/index.d.ts",
+  "typesVersions": {
+    "*": {
+      ".": [
+        "./dist/index.d.ts"
+      ]
+    }
+  },
+  "version": "0.0.4"
 }
