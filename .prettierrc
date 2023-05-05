@@ -12,6 +12,6 @@
       }
     }
   ],
-  "arrowParens": "always",
+  "arrowParens": "avoid",
   "vueIndentScriptAndStyle": false
 }

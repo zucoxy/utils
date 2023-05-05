@@ -6,6 +6,18 @@
     "@typescript-eslint/semi": "off",
     "no-mixed-operators": "off",
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/prefer-ts-expect-error": "off"
+    "@typescript-eslint/prefer-ts-expect-error": "off",
+    "@typescript-eslint/comma-dangle": "off",
+    "@typescript-eslint/brace-style": "off",
+    "@typescript-eslint/member-delimiter-style": ["error",
+      {
+        "singleline": {
+          "delimiter": "semi",
+          "requireLast": true
+        }
+      }],
+    "operator-linebreak": "off",
+    "curly": ["error", "multi-line"],
+    "arrow-parens": ["error", "as-needed"]
   }
 }
