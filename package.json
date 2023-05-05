@@ -50,5 +50,5 @@
     "release": "bumpp --commit --push --tag && npm publish"
   },
   "types": "./dist/index.d.ts",
-  "version": "0.0.8"
+  "version": "0.0.9"
 }
