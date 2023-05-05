@@ -2,7 +2,7 @@ lockfileVersion: 5.4
 
 specifiers:
   '@types/node': ^18.11.9
-  '@unyu/eslint-config': ^0.1.9
+  '@unyu/eslint-config': ^0.1.14
   bumpp: ^8.2.1
   eslint: ^8.28.0
   eslint-config-prettier: ^8.5.0
@@ -15,7 +15,7 @@ specifiers:
 
 devDependencies:
   '@types/node': 18.16.3
-  '@unyu/eslint-config': 0.1.9_tbtvr3a5zwdiktqy4vlmx63mqq
+  '@unyu/eslint-config': 0.1.14_tbtvr3a5zwdiktqy4vlmx63mqq
   bumpp: 8.2.1
   eslint: 8.39.0
   eslint-config-prettier: 8.8.0_eslint@8.39.0
@@ -578,8 +578,8 @@ packages:
       eslint-visitor-keys: 3.4.0
     dev: true
 
-  /@unyu/eslint-config-basic/0.1.9_qxmx6fzgkdavatog5ddwdbkp5i:
-    resolution: {integrity: sha512-5d+JhKwDk17JxblMJEQzLFu4wsATlx2b3r/c514ms8EOszYf68sWdtq3MXe5z/GHv/iXlgFm0qdkvGkWkTqmiw==}
+  /@unyu/eslint-config-basic/0.1.14_qxmx6fzgkdavatog5ddwdbkp5i:
+    resolution: {integrity: sha512-rDAyVDz3sQk2UB9iF7/igBEuofXuniwSEvrEnOFJFxqd/LcxwbXx4XJrQKeo8fOAAdm9kDHB3dQfF/j4WToA9Q==}
     peerDependencies:
       eslint: '>=7.4.0'
     dependencies:
@@ -594,7 +594,7 @@ packages:
       eslint-plugin-promise: 6.1.1_eslint@8.39.0
       eslint-plugin-unicorn: 46.0.0_eslint@8.39.0
       eslint-plugin-unused-imports: 2.0.0_afnavo7csaazav2mgythkjdz5u
-      eslint-plugin-unyu: 0.1.9_tbtvr3a5zwdiktqy4vlmx63mqq
+      eslint-plugin-unyu: 0.1.14_tbtvr3a5zwdiktqy4vlmx63mqq
       eslint-plugin-yml: 1.5.0_eslint@8.39.0
       jsonc-eslint-parser: 2.2.0
       yaml-eslint-parser: 1.2.0
@@ -607,15 +607,15 @@ packages:
       - typescript
     dev: true
 
-  /@unyu/eslint-config-ts/0.1.9_tbtvr3a5zwdiktqy4vlmx63mqq:
-    resolution: {integrity: sha512-JTX6neoeCKpdgASJmfTX0F5AynWpWPxwCkts8xLoqa893lGLVvaBcFvRalTXuZBCKfo8KiSBZkXtacA95LVwEg==}
+  /@unyu/eslint-config-ts/0.1.14_tbtvr3a5zwdiktqy4vlmx63mqq:
+    resolution: {integrity: sha512-pOujpl8TXfRnhudhCo/O4JCuIZq7u73DSZb/UF/tNCxMXgsp2ZxHitDDKIDt3JaLlXqOgI8suOLgIZFG5QDuYA==}
     peerDependencies:
       eslint: '>=7.4.0'
       typescript: '>=3.9'
     dependencies:
       '@typescript-eslint/eslint-plugin': 5.59.2_nr77geh6egtp3eynhvdfit4gsu
       '@typescript-eslint/parser': 5.59.2_tbtvr3a5zwdiktqy4vlmx63mqq
-      '@unyu/eslint-config-basic': 0.1.9_qxmx6fzgkdavatog5ddwdbkp5i
+      '@unyu/eslint-config-basic': 0.1.14_qxmx6fzgkdavatog5ddwdbkp5i
       eslint: 8.39.0
       eslint-plugin-jest: 27.2.1_yu3fmf337fvxnzglsafardmpim
       typescript: 4.9.5
@@ -626,13 +626,13 @@ packages:
       - supports-color
     dev: true
 
-  /@unyu/eslint-config-vue/0.1.9_qxmx6fzgkdavatog5ddwdbkp5i:
-    resolution: {integrity: sha512-a1pOds+1V1rGUQZQIqcjEtXO0oNVCNlt1IOxVjyaGOfphmG8H27uB2wzCQgqAJ2VUjNwNkU/XXlI2YvuIJ06hg==}
+  /@unyu/eslint-config-vue/0.1.14_qxmx6fzgkdavatog5ddwdbkp5i:
+    resolution: {integrity: sha512-zNzQS8Jn5oLJ9qLpUNTx4ySLN6fVZO3kTgKzmOxmdqfSAzm+7M7MucbBYf6mgwCbgMUjbAhH1PFsOmj8NPGOEQ==}
     peerDependencies:
       eslint: '>=7.4.0'
     dependencies:
-      '@unyu/eslint-config-basic': 0.1.9_qxmx6fzgkdavatog5ddwdbkp5i
-      '@unyu/eslint-config-ts': 0.1.9_tbtvr3a5zwdiktqy4vlmx63mqq
+      '@unyu/eslint-config-basic': 0.1.14_qxmx6fzgkdavatog5ddwdbkp5i
+      '@unyu/eslint-config-ts': 0.1.14_tbtvr3a5zwdiktqy4vlmx63mqq
       eslint: 8.39.0
       eslint-plugin-vue: 9.11.0_eslint@8.39.0
       local-pkg: 0.4.3
@@ -646,14 +646,14 @@ packages:
       - typescript
     dev: true
 
-  /@unyu/eslint-config/0.1.9_tbtvr3a5zwdiktqy4vlmx63mqq:
-    resolution: {integrity: sha512-fZpOlEOtOljDi9d7igeNGA8c3X/QpIFhOq6FL7ySw/1+y9qSy+xc/qR+tSbpNXKhyAv1sLi+dov5tOJifDceqg==}
+  /@unyu/eslint-config/0.1.14_tbtvr3a5zwdiktqy4vlmx63mqq:
+    resolution: {integrity: sha512-tyIEbTTViArCkfqyjA6y05yynGwchYSTNU2eiqxwGI8gNOtmzhpO1i1/2yBT6wfd2dtMxtdplj3QCSWvfisaig==}
     peerDependencies:
       eslint: '>=7.4.0'
     dependencies:
       '@typescript-eslint/eslint-plugin': 5.59.2_nr77geh6egtp3eynhvdfit4gsu
       '@typescript-eslint/parser': 5.59.2_tbtvr3a5zwdiktqy4vlmx63mqq
-      '@unyu/eslint-config-vue': 0.1.9_qxmx6fzgkdavatog5ddwdbkp5i
+      '@unyu/eslint-config-vue': 0.1.14_qxmx6fzgkdavatog5ddwdbkp5i
       eslint: 8.39.0
       eslint-plugin-eslint-comments: 3.2.0_eslint@8.39.0
       eslint-plugin-html: 7.1.0
@@ -1650,8 +1650,8 @@ packages:
       eslint-rule-composer: 0.3.0
     dev: true
 
-  /eslint-plugin-unyu/0.1.9_tbtvr3a5zwdiktqy4vlmx63mqq:
-    resolution: {integrity: sha512-Msp+HNS/V0VOZ/Lv8EK85Mo9gVKoH9xZ9/1FT1CmFQ856sfPmKArgFHU98yFur6SqwzZ1bRXll3EU/qwKFAWNQ==}
+  /eslint-plugin-unyu/0.1.14_tbtvr3a5zwdiktqy4vlmx63mqq:
+    resolution: {integrity: sha512-DYXtSgPSRLQ4qO8nncuS8c9/4CUyePgx/n1BXfoJS25T1hXys5oM9j56GyfgkTBQd0+cRDm5DX0NL8FQpgPZyw==}
     dependencies:
       '@typescript-eslint/utils': 5.59.2_tbtvr3a5zwdiktqy4vlmx63mqq
     transitivePeerDependencies:

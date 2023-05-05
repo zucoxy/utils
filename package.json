@@ -6,7 +6,7 @@
   "description": "My Commonly used JS/TS utils",
   "devDependencies": {
     "@types/node": "^18.11.9",
-    "@unyu/eslint-config": "^0.1.9",
+    "@unyu/eslint-config": "^0.1.14",
     "bumpp": "^8.2.1",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
