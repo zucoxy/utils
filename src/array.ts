@@ -3,7 +3,7 @@ import { isObject } from './is';
 
 /**
  * 传入一个数组，返回 labelValue 格式的数组数据
- * @param arr 1. string[]  2. number[]  3. [value, label][]
+ * @param arr - 1. string[]  2. number[]  3. [value, label][] 4. {value: label}[]
  */
 export const arrayToOption = <V>(arr: any[]): Required<LabelValue<V>>[] => {
   return arr.map(item => {
@@ -11,6 +11,8 @@ export const arrayToOption = <V>(arr: any[]): Required<LabelValue<V>>[] => {
     if (isObject(item)) {
       if (Array.isArray(item)) {
         options = { value: item[0], label: item[1] };
+      } else if (Object.hasOwn(item, 'value') && Object.hasOwn(item, 'label')) {
+        options = item as LabelValue;
       } else {
         const entry: any[] = Object.entries(item);
         options = { value: entry[0][0], label: entry[0][1] };
