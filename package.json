@@ -47,8 +47,8 @@
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --fix",
     "prettier": "prettier --write .",
-    "release": "bumpp --commit --push --tag && npm publish"
+    "release": "pnpm run build-fast && bumpp --commit --push --tag && npm publish"
   },
   "types": "./dist/index.d.ts",
-  "version": "0.0.12"
+  "version": "0.0.13"
 }
