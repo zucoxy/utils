@@ -8,10 +8,10 @@ import { isObject } from './is';
 export const arrayToOption = <V>(arr: any[]): Required<LabelValue<V>>[] => {
   return arr.map(item => {
     let options: Required<LabelValue<V>> = { value: item, label: item };
-    if (isObject(item)) {
-      if (Array.isArray(item)) {
-        options = { value: item[0], label: item[1] };
-      } else if (Object.hasOwn(item, 'value') && Object.hasOwn(item, 'label')) {
+    if (Array.isArray(item)) {
+      options = { value: item[0], label: item[1] };
+    } else if (isObject(item)) {
+      if (Object.hasOwn(item, 'value') && Object.hasOwn(item, 'label')) {
         options = item as LabelValue;
       } else {
         const entry: any[] = Object.entries(item);
