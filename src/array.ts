@@ -5,7 +5,7 @@ import { isObject } from './is';
  * 传入一个数组，返回 labelValue 格式的数组数据
  * @param array - 1. string[]  2. number[]  3. [value, label][] 4. {value: label}[]
  */
-const arrayToOption = <V>(array: any[]): Required<LabelValue<V>>[] => {
+export const arrayToOption = <V>(array: any[]): Required<LabelValue<V>>[] => {
   if (!Array.isArray(array)) {
     console.warn('TypeError: array excepted to be Array');
     return array;
