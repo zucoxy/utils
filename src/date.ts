@@ -142,28 +142,17 @@ export function formatAxis(param: Date): string {
 }
 
 /**
- * 根据起始时间按间隔生成时间列表。 [YYYY-mm-dd HH:MM:SS]
+ * 根据起始时间按间隔生成时间列表。 [YYYY-MM-DD HH:mm:ss]
  * @params startDate 开始时间
  * @params endDate 结束时间
  * @params timeUnit 时间间隔, *注意是毫秒数
  **/
-export function createTimeUnitListByTimeRange(
-  timeUnit: number,
-  startDate = '2022-02-02 00:00',
-  endDate = '2022-02-02 23:45'
-) {
+export function createTimeUnitListByTimeRange(timeUnit: number, startDate: string, endDate: string) {
   const startSeconds = new Date(startDate).getTime();
   const endSeconds = new Date(endDate).getTime();
 
-  // 必须用计算机初始时间的时间戳来作为基准点，否则时区会影响初始时间戳毫秒数
-  const base = new Date('1970-01-01 00:00:00').getTime();
-
   const rangeTimeUnitList = [];
-  let firstDegree;
-
-  // 第一个刻度，可能刚好在你需要的整点刻度上，如果不在整点上，减去多余的部分，往前推一个刻度。
-  // 此处就是减掉基准时间戳再执行整除操作，否则如果以天为刻度，整除86400000，得到的第一个刻度会是包含时区的时间，如北京时间：2020-09-10 08：00：00
-  firstDegree = startSeconds - ((startSeconds - base) % timeUnit);
+  let firstDegree = startSeconds;
 
   rangeTimeUnitList.push(firstDegree);
 
