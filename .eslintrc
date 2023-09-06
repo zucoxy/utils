@@ -3,5 +3,6 @@
   "extends": "@unyu",
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
+    "@typescript-eslint/member-delimiter-style": "off"
   }
 }
