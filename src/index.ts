@@ -6,3 +6,5 @@ export * from './date';
 export * from './types';
 export * from './url';
 export * from './img';
+export * from './color';
+export * from './clone';
