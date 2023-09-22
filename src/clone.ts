@@ -74,6 +74,8 @@ export function deepClone(target: any, map = new WeakMap()) {
     return target;
   }
 
+  if (typeof target === 'function') return target;
+
   // 初始化
   const type = toString(target);
   let cloneTarget: any;
