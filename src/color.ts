@@ -205,7 +205,7 @@ export function colorToHsv(color: any): { h: number; s: number; v: number } {
  */
 export function colorLighten(hex: string, ratio: number): string {
   let { r, g, b, a } = hex2rgba(hex);
-  let a1 = 'ff';
+  let a1;
   a = parseFloat(a.toString());
   if (a !== 1) {
     const temp = Math.floor(256 * a);
@@ -223,7 +223,7 @@ export function colorLighten(hex: string, ratio: number): string {
   const paddedColor = `000000${lighterColor}`.slice(-6);
 
   // 添加井号 # 并返回变浅后的颜色值
-  return `#${paddedColor}${a1}`;
+  return `#${paddedColor}${a1 || ''}`;
 }
 
 /**
@@ -235,7 +235,7 @@ export function colorDarken(hex: string, ratio: number): string {
   let { r, g, b, a } = hex2rgba(hex);
 
   // 处理透明度
-  let a1 = 'ff';
+  let a1;
   a = parseFloat(a.toString());
   if (a !== 1) {
     const temp = Math.floor(256 * a);
@@ -254,5 +254,20 @@ export function colorDarken(hex: string, ratio: number): string {
   const paddedColor = `000000${darkerColor}`.slice(-6);
 
   // 添加井号 # 并返回加深后的颜色值
-  return `#${paddedColor}${a1}`;
+  return `#${paddedColor}${a1 || ''}`;
+}
+
+/**
+ * 计算 rgb 的亮度 Y，Y 值小于 128 则认为是深色，大于等于 128 则认为是浅色
+ * @param color - hex 十六进制颜色
+ * @return boolean
+ */
+export function isDarkColor(color: string) {
+  const { r, g, b, a } = hex2rgba(color);
+
+  // 计算相对亮度
+  const y = 0.299 * r + 0.587 * g + 0.114 * b;
+
+  // 判断颜色是深色还是浅色
+  return y < 128;
 }
