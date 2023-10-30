@@ -40,7 +40,7 @@ export function arrayToTree(
   result.push(
     ...data
       .map(item => {
-        if (!item[fieldNames.parentKey] || item[fieldNames.parentKey] === parentKey) {
+        if (item[fieldNames.parentKey] === parentKey) {
           item[fieldNames.children] = [];
           return item;
         }
@@ -48,10 +48,10 @@ export function arrayToTree(
       })
       .filter(item => item)
   );
-  const filterData = data.filter(item => item[fieldNames.parentKey] !== parentKey && item[fieldNames.parentKey]);
+  const filterData = data.filter(item => item[fieldNames.parentKey] !== parentKey);
   return result.map(item => {
     if (filterData.length) {
-      const arr = arrayToTree(filterData, item[fieldNames.key], fieldNames);
+      const arr = arrayToTree(filterData, fieldNames, item[fieldNames.key]);
       if (arr.length && item[fieldNames.children]) item[fieldNames.children].push(...arr);
       if (!arr.length) delete item[fieldNames.children];
     }
