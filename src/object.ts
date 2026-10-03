@@ -251,3 +251,49 @@ function equal(a: unknown, b: unknown, seen: WeakMap<object, WeakSet<object>>): 
  * isEqual(new Set([1, 2]), new Set([2, 1])); // true
  */
 export const isEqual = (a: unknown, b: unknown): boolean => equal(a, b, new WeakMap());
+
+/** `mergeWith` 的自定义合并函数；返回非 `undefined` 时使用该返回值，否则走默认合并 */
+export type MergeCustomizer = (
+  objValue: unknown,
+  srcValue: unknown,
+  key: string,
+  object: Record<string, unknown>,
+  source: Record<string, unknown>,
+) => unknown;
+
+function mergeWithInto(target: Record<string, unknown>, source: Record<string, unknown>, customizer: MergeCustomizer): void {
+  for (const key in source) {
+    const objValue = target[key];
+    const srcValue = source[key];
+    const custom = customizer(objValue, srcValue, key, target, source);
+    if (custom !== undefined) {
+      target[key] = custom;
+    }
+    else if (isObject(objValue) && isObject(srcValue)) {
+      mergeWithInto(objValue, srcValue, customizer);
+    }
+    else {
+      target[key] = srcValue;
+    }
+  }
+}
+
+/**
+ * 深度合并，并用 `customizer` 自定义冲突处理（类似 lodash `mergeWith`，原地修改 `object`）
+ * @param object 目标对象
+ * @param source 来源对象
+ * @param customizer 自定义合并函数，返回 `undefined` 时回退到默认的深度合并 / 覆盖
+ * @returns 合并后的 `object`
+ * @example
+ * mergeWith({ a: [1] }, { a: [2] }, (objValue, srcValue) =>
+ *   Array.isArray(objValue) && Array.isArray(srcValue) ? [...objValue, ...srcValue] : undefined,
+ * ); // { a: [1, 2] }
+ */
+export function mergeWith<T extends Record<string, unknown>>(
+  object: T,
+  source: Record<string, unknown>,
+  customizer: MergeCustomizer,
+): T {
+  mergeWithInto(object, source, customizer);
+  return object;
+}

@@ -8,6 +8,7 @@ import {
   isEqual,
   mapKeys,
   mapValues,
+  mergeWith,
   objectToOption,
   omit,
   pick,
@@ -126,5 +127,28 @@ describe('isEqual', () => {
     const b: { self?: unknown } = {};
     b.self = b;
     expect(isEqual(a, b)).toBe(true);
+  });
+});
+
+describe('mergeWith', () => {
+  it('customizer 返回非 undefined 时以其结果为准', () => {
+    const result = mergeWith({ a: [1], b: 1 }, { a: [2], b: 2 }, (objValue, srcValue) =>
+      Array.isArray(objValue) && Array.isArray(srcValue)
+        ? [...(objValue as unknown[]), ...(srcValue as unknown[])]
+        : undefined,
+    );
+    expect(result).toEqual({ a: [1, 2], b: 2 });
+  });
+
+  it('customizer 返回 undefined 时回退到默认深度合并', () => {
+    const result = mergeWith({ a: { x: 1 } }, { a: { y: 2 } }, () => undefined);
+    expect(result).toEqual({ a: { x: 1, y: 2 } });
+  });
+
+  it('可基于 key 做数值相加', () => {
+    const result = mergeWith({ a: 1, b: 1 }, { a: 2, b: 3 }, (objValue, srcValue) =>
+      typeof objValue === 'number' && typeof srcValue === 'number' ? objValue + srcValue : undefined,
+    );
+    expect(result).toEqual({ a: 3, b: 4 });
   });
 });

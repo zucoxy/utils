@@ -18,6 +18,7 @@ import {
   union,
   unique,
   uniqueBy,
+  zip,
 } from '../src/array';
 
 describe('arrayToOption', () => {
@@ -109,8 +110,14 @@ describe('chunk / groupBy', () => {
     expect(() => chunk([1], 0)).toThrow(RangeError);
   });
 
-  it('groupBy', () => {
+  it('groupBy 支持取值函数', () => {
     const result = groupBy([{ t: 'a', v: 1 }, { t: 'b', v: 2 }, { t: 'a', v: 3 }], item => item.t);
+    expect(result.a).toHaveLength(2);
+    expect(result.b).toEqual([{ t: 'b', v: 2 }]);
+  });
+
+  it('groupBy 支持属性名（lodash 简写）', () => {
+    const result = groupBy([{ t: 'a', v: 1 }, { t: 'b', v: 2 }, { t: 'a', v: 3 }], 't');
     expect(result.a).toHaveLength(2);
     expect(result.b).toEqual([{ t: 'b', v: 2 }]);
   });
@@ -170,5 +177,26 @@ describe('aggregation', () => {
     expect(first([1, 2])).toBe(1);
     expect(last([1, 2])).toBe(2);
     expect(first([])).toBeUndefined();
+  });
+});
+
+describe('zip', () => {
+  it('按索引合并多个数组，缺失位置为 undefined', () => {
+    expect(zip([1, 2, 3], ['a', 'b'])).toEqual([
+      [1, 'a'],
+      [2, 'b'],
+      [3, undefined],
+    ]);
+    expect(
+      zip(
+        [1, 2],
+        [3, 4],
+        [5, 6],
+      ),
+    ).toEqual([
+      [1, 3, 5],
+      [2, 4, 6],
+    ]);
+    expect(zip()).toEqual([]);
   });
 });

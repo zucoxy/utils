@@ -42,8 +42,8 @@ getMessages('en-US').date.justNow; // 'just now'
 
 - **base**：`assert` `toString` `getTypeName`
 - **is**：`isDef` `isBoolean` `isFunction` `isNumber` `isString` `isObject` `isUndefined` `isNull` `isSymbol` `isRegExp` `isDate` `isFile` `isError` `isMap` `isSet` `isArray` `isWindow` `isBrowser`
-- **array**：`arrayToOption` `arrayToTree` `unique` `uniqueBy` `chunk` `groupBy` `sortBy` `compact` `difference` `intersection` `union` `shuffle` `sample` `range` `sumBy` `mean` `first` `last`
-- **object**：`deepMerge` `yamlToObj` `objectToOption` `pick` `omit` `getByPath` `setByPath` `hasPath` `isEmpty` `invert` `mapValues` `mapKeys` `isEqual`
+- **array**：`arrayToOption` `arrayToTree` `unique` `uniqueBy` `chunk` `groupBy` `sortBy` `compact` `difference` `intersection` `union` `shuffle` `sample` `range` `sumBy` `mean` `first` `last` `zip`
+- **object**：`deepMerge` `mergeWith` `yamlToObj` `objectToOption` `pick` `omit` `getByPath` `setByPath` `hasPath` `isEmpty` `invert` `mapValues` `mapKeys` `isEqual`
 - **number**：`clamp` `inRange` `lerp` `roundTo` `ceilTo` `floorTo` `toFixed` `thousands` `formatFileSize` `randomInt` `randomFloat` `isEven` `isOdd` `percentage`
 - **date**：`formatDate` `getWeek` `formatPast` `formatAxis` `createTimeUnitListByTimeRange`（均支持 `locale`）
 - **color**：`randomColor` `hsv2rgb` `rgb2hsv` `rgba2hex` `hex2rgba` `colorToHsv` `colorLighten` `colorDarken` `isDarkColor`

@@ -104,19 +104,26 @@ export const chunk = <T>(arr: readonly T[], size: number): T[][] => {
 
 /**
  * 按 key 分组
- * @param key 取值函数
+ * @param arr 源数组
+ * @param iteratee 取值函数，或属性名（等价于 lodash 的 iteratee 简写）
+ * @returns 以分组键为 key、分组数组为 value 的对象
  * @example
  * groupBy([{ t: 'a' }, { t: 'b' }, { t: 'a' }], item => item.t);
  * // { a: [{t:'a'}, {t:'a'}], b: [{t:'b'}] }
+ * groupBy([{ t: 'a' }, { t: 'b' }, { t: 'a' }], 't');
+ * // 同上
  */
-export const groupBy = <T, K extends PropertyKey>(arr: readonly T[], key: (item: T) => K): Record<K, T[]> => {
-  const result = {} as Record<K, T[]>;
+export function groupBy<T, K extends PropertyKey>(arr: readonly T[], iteratee: (item: T) => K): Record<K, T[]>;
+export function groupBy<T, K extends keyof T>(arr: readonly T[], iteratee: K): Record<Extract<T[K], PropertyKey>, T[]>;
+export function groupBy<T>(arr: readonly T[], iteratee: ((item: T) => PropertyKey) | keyof T): Record<PropertyKey, T[]> {
+  const getKey = typeof iteratee === 'function' ? iteratee : (item: T) => item[iteratee] as PropertyKey;
+  const result: Record<PropertyKey, T[]> = {};
   for (const item of arr) {
-    const k = key(item);
-    (result[k] ??= []).push(item);
+    const key = getKey(item);
+    (result[key] ??= []).push(item);
   }
   return result;
-};
+}
 
 const compareValues = (a: unknown, b: unknown): number => {
   if (Object.is(a, b)) return 0;
@@ -252,3 +259,24 @@ export const first = <T>(arr: readonly T[]): T | undefined => arr[0];
  * last([1, 2]); // 2
  */
 export const last = <T>(arr: readonly T[]): T | undefined => arr[arr.length - 1];
+
+/** `zip` 结果类型：每行第 K 个元素来自第 K 个入参数组，长度不足为 `undefined` */
+export type Zipped<T extends ReadonlyArray<ReadonlyArray<unknown>>> = Array<{
+  [K in keyof T]: T[K] extends ReadonlyArray<infer U> ? U | undefined : never;
+}>;
+
+/**
+ * 按索引把多个数组“拉链”合并（类似 lodash `zip`）
+ * @param arrays 任意个数组（各数组元素类型可不同）
+ * @returns 二维数组，长度取最长数组，缺失位置为 `undefined`
+ * @example
+ * zip([1, 2, 3], ['a', 'b']); // [[1, 'a'], [2, 'b'], [3, undefined]]
+ */
+export function zip<T extends ReadonlyArray<ReadonlyArray<unknown>>>(...arrays: T): Zipped<T> {
+  const length = arrays.reduce((max, arr) => Math.max(max, arr.length), 0);
+  const result: unknown[][] = [];
+  for (let i = 0; i < length; i++) {
+    result.push(arrays.map(arr => arr[i]));
+  }
+  return result as unknown as Zipped<T>;
+}
