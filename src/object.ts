@@ -280,22 +280,38 @@ function mergeWithInto(target: Record<string, unknown>, source: Record<string, u
   }
 }
 
+/** 判断是否 `mergeWith` 的自定义合并函数 */
+const isMergeCustomizer = (value: unknown): value is MergeCustomizer => typeof value === 'function';
+
+/** `mergeWith` 的可变参数：任意个来源（可空）+ 最后一个自定义合并函数 */
+type MergeWithArgs = Array<Record<string, unknown> | MergeCustomizer | null | undefined>;
+
 /**
- * 深度合并，并用 `customizer` 自定义冲突处理（类似 lodash `mergeWith`，原地修改 `object`）
- * @param object 目标对象
- * @param source 来源对象
- * @param customizer 自定义合并函数，返回 `undefined` 时回退到默认的深度合并 / 覆盖
+ * 深度合并多个来源，并用 `customizer` 自定义冲突处理（类似 lodash `mergeWith`，原地修改 `object`）
+ *
+ * 参数形式与 lodash 一致：`mergeWith(object, ...sources, customizer)`，**最后一个参数必须是自定义合并函数**；
+ * 来源中的 `null` / `undefined` 会被跳过，便于 `...list.map(item => item.data?.count)` 这类可空来源。
+ * @param object 目标对象（原地修改并返回）
+ * @param args 任意个来源对象，最后跟一个自定义合并函数
  * @returns 合并后的 `object`
  * @example
  * mergeWith({ a: [1] }, { a: [2] }, (objValue, srcValue) =>
  *   Array.isArray(objValue) && Array.isArray(srcValue) ? [...objValue, ...srcValue] : undefined,
  * ); // { a: [1, 2] }
+ *
+ * // 多来源：把多个对象的同名字段相加
+ * mergeWith({}, { a: 1, b: 2 }, { a: 3 }, (objValue, srcValue) => (objValue || 0) + (srcValue || 0));
+ * // { a: 4, b: 2 }
  */
-export function mergeWith<T extends Record<string, unknown>>(
-  object: T,
-  source: Record<string, unknown>,
-  customizer: MergeCustomizer,
-): T {
-  mergeWithInto(object, source, customizer);
+export function mergeWith<T extends Record<string, unknown>>(object: T, ...args: MergeWithArgs): T {
+  const customizer = args.pop();
+  if (!isMergeCustomizer(customizer)) {
+    throw new TypeError('mergeWith: 最后一个参数必须为自定义合并函数');
+  }
+  for (const source of args) {
+    if (source !== null && typeof source === 'object') {
+      mergeWithInto(object, source, customizer);
+    }
+  }
   return object;
 }

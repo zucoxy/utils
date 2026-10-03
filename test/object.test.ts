@@ -151,6 +151,25 @@ describe('mergeWith', () => {
     );
     expect(result).toEqual({ a: 3, b: 4 });
   });
+
+  it('支持多个来源（mergeWith(obj, ...sources, customizer)）', () => {
+    const counts = [{ a: 1, b: 2 }, { a: 3 }, { b: 4 }];
+    const result = mergeWith({}, ...counts, (objValue, srcValue) =>
+      typeof objValue === 'number' && typeof srcValue === 'number' ? objValue + srcValue : undefined,
+    );
+    expect(result).toEqual({ a: 4, b: 6 });
+  });
+
+  it('跳过 null / undefined 来源', () => {
+    const result = mergeWith({ a: 1 }, undefined, null, { a: 2 }, (objValue, srcValue) =>
+      typeof objValue === 'number' && typeof srcValue === 'number' ? objValue + srcValue : undefined,
+    );
+    expect(result).toEqual({ a: 3 });
+  });
+
+  it('缺少 customizer 时抛错', () => {
+    expect(() => mergeWith({ a: 1 }, { a: 2 })).toThrow(TypeError);
+  });
 });
 
 describe('原型污染加固', () => {
