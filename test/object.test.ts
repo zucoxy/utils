@@ -152,3 +152,23 @@ describe('mergeWith', () => {
     expect(result).toEqual({ a: 3, b: 4 });
   });
 });
+
+describe('原型污染加固', () => {
+  it('setByPath 的 __proto__ 段不会污染原型', () => {
+    const target: Record<string, unknown> = {};
+    setByPath(target, '__proto__.polluted', true);
+    expect(Object.keys(target)).toEqual(['__proto__']);
+    expect(Object.getPrototypeOf(target)).toBe(Object.prototype);
+    expect((Object.prototype as unknown as Record<string, unknown>).polluted).toBeUndefined();
+  });
+
+  it('invert / mapKeys 的 __proto__ 结果不污染原型', () => {
+    const inverted = invert({ a: '__proto__' });
+    expect(Object.keys(inverted)).toEqual(['__proto__']);
+    expect(Object.getPrototypeOf(inverted)).toBe(Object.prototype);
+
+    const mapped = mapKeys({ a: 1 }, () => '__proto__');
+    expect(Object.keys(mapped)).toEqual(['__proto__']);
+    expect(Object.getPrototypeOf(mapped)).toBe(Object.prototype);
+  });
+});

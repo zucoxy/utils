@@ -1,5 +1,6 @@
 import { parse } from 'yaml';
 import { toString } from './base';
+import { hasOwn, setOwn } from './internal';
 import { isObject } from './is';
 import type { LabelValue } from './types';
 
@@ -20,9 +21,9 @@ const arrayTag = '[object Array]';
 export function deepMerge<T extends Record<string, unknown>>(baseObj: T, newObj: Record<string, unknown>): T {
   const target = baseObj as Record<string, unknown>;
   for (const key in newObj) {
-    const baseValue = target[key];
+    const baseValue = hasOwn(target, key) ? target[key] : undefined;
     const newValue = newObj[key];
-    target[key] = isObject(baseValue) && isObject(newValue) ? deepMerge(baseValue, newValue) : newValue;
+    setOwn(target, key, isObject(baseValue) && isObject(newValue) ? deepMerge(baseValue, newValue) : newValue);
   }
   return baseObj;
 }
@@ -113,16 +114,17 @@ export function getByPath<T = unknown>(obj: unknown, path: string, defaultValue?
 export function setByPath(obj: Record<string, unknown>, path: string, value: unknown): Record<string, unknown> {
   const keys = toPathKeys(path);
   if (!keys.length) return obj;
-  let current: Record<string | number, unknown> = obj;
+  let current: object = obj;
   for (let i = 0; i < keys.length - 1; i++) {
     const key = keys[i];
-    const next = current[key];
+    // 只认自有属性，避免 `__proto__` 段读到原型链对象后再写入，造成原型污染
+    const next = hasOwn(current, key) ? (current as Record<string, unknown>)[key] : undefined;
     if (next === null || typeof next !== 'object') {
-      current[key] = /^\d+$/.test(keys[i + 1]) ? [] : {};
+      setOwn(current, key, /^\d+$/.test(keys[i + 1]) ? [] : {});
     }
-    current = current[key] as Record<string | number, unknown>;
+    current = (current as Record<string, unknown>)[key] as object;
   }
-  current[keys[keys.length - 1]] = value;
+  setOwn(current, keys[keys.length - 1], value);
   return obj;
 }
 
@@ -165,7 +167,7 @@ export function isEmpty(value: unknown): boolean {
  */
 export const invert = (obj: Record<string, string>): Record<string, string> => {
   const result: Record<string, string> = {};
-  for (const key of Object.keys(obj)) result[obj[key]] = key;
+  for (const key of Object.keys(obj)) setOwn(result, obj[key], key);
   return result;
 };
 
@@ -176,7 +178,7 @@ export const invert = (obj: Record<string, string>): Record<string, string> => {
  */
 export function mapValues<V, R>(obj: Record<string, V>, fn: (value: V, key: string) => R): Record<string, R> {
   const result: Record<string, R> = {};
-  for (const key of Object.keys(obj)) result[key] = fn(obj[key], key);
+  for (const key of Object.keys(obj)) setOwn(result, key, fn(obj[key], key));
   return result;
 }
 
@@ -190,7 +192,7 @@ export function mapKeys<K extends PropertyKey>(
   fn: (key: string, value: unknown) => K,
 ): Record<K, unknown> {
   const result = {} as Record<K, unknown>;
-  for (const key of Object.keys(obj)) result[fn(key, obj[key])] = obj[key];
+  for (const key of Object.keys(obj)) setOwn(result, fn(key, obj[key]), obj[key]);
   return result;
 }
 
@@ -263,17 +265,17 @@ export type MergeCustomizer = (
 
 function mergeWithInto(target: Record<string, unknown>, source: Record<string, unknown>, customizer: MergeCustomizer): void {
   for (const key in source) {
-    const objValue = target[key];
+    const objValue = hasOwn(target, key) ? target[key] : undefined;
     const srcValue = source[key];
     const custom = customizer(objValue, srcValue, key, target, source);
     if (custom !== undefined) {
-      target[key] = custom;
+      setOwn(target, key, custom);
     }
     else if (isObject(objValue) && isObject(srcValue)) {
       mergeWithInto(objValue, srcValue, customizer);
     }
     else {
-      target[key] = srcValue;
+      setOwn(target, key, srcValue);
     }
   }
 }

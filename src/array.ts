@@ -1,5 +1,13 @@
-import type { LabelValue } from './types';
+import { hasOwn, setOwn } from './internal';
 import { isObject } from './is';
+import type { LabelValue } from './types';
+
+/** 取值选择器：取值函数，或属性名（lodash 风格简写） */
+type Selector<T, R> = ((item: T) => R) | keyof T;
+
+/** 把「取值函数 | 属性名」统一成取值函数 */
+const toGetter = <T, R>(selector: Selector<T, R>): ((item: T) => R) =>
+  typeof selector === 'function' ? selector : (item: T) => item[selector] as unknown as R;
 
 /**
  * 把数组转换成 `LabelValue` 格式（常用于下拉选项）
@@ -71,22 +79,24 @@ export const unique = <T>(arr: readonly T[]): T[] => Array.from(new Set(arr));
 /**
  * 按 key 去重，保留首次出现的元素
  * @param arr 源数组
- * @param key 取值函数
+ * @param iteratee 取值函数，或属性名（lodash 简写）
  * @example
  * uniqueBy([{ id: 1 }, { id: 1 }, { id: 2 }], item => item.id); // [{ id: 1 }, { id: 2 }]
+ * uniqueBy([{ id: 1 }, { id: 1 }, { id: 2 }], 'id'); // 同上
  */
-export const uniqueBy = <T, K>(arr: readonly T[], key: (item: T) => K): T[] => {
-  const seen = new Set<K>();
+export function uniqueBy<T>(arr: readonly T[], iteratee: ((item: T) => PropertyKey) | keyof T): T[] {
+  const getKey = toGetter<T, PropertyKey>(iteratee);
+  const seen = new Set<PropertyKey>();
   const result: T[] = [];
   for (const item of arr) {
-    const k = key(item);
-    if (!seen.has(k)) {
-      seen.add(k);
+    const key = getKey(item);
+    if (!seen.has(key)) {
+      seen.add(key);
       result.push(item);
     }
   }
   return result;
-};
+}
 
 /**
  * 按固定长度分块
@@ -116,11 +126,13 @@ export const chunk = <T>(arr: readonly T[], size: number): T[][] => {
 export function groupBy<T, K extends PropertyKey>(arr: readonly T[], iteratee: (item: T) => K): Record<K, T[]>;
 export function groupBy<T, K extends keyof T>(arr: readonly T[], iteratee: K): Record<Extract<T[K], PropertyKey>, T[]>;
 export function groupBy<T>(arr: readonly T[], iteratee: ((item: T) => PropertyKey) | keyof T): Record<PropertyKey, T[]> {
-  const getKey = typeof iteratee === 'function' ? iteratee : (item: T) => item[iteratee] as PropertyKey;
+  const getKey = toGetter<T, PropertyKey>(iteratee);
   const result: Record<PropertyKey, T[]> = {};
   for (const item of arr) {
     const key = getKey(item);
-    (result[key] ??= []).push(item);
+    // hasOwnProperty + setOwn：避免 `__proto__` 作为 key 时抛错或污染原型
+    if (hasOwn(result, key)) result[key].push(item);
+    else setOwn(result, key, [item]);
   }
   return result;
 }
@@ -134,22 +146,50 @@ const compareValues = (a: unknown, b: unknown): number => {
   return String(a).localeCompare(String(b));
 };
 
+/** 排序方向 */
+export type SortOrder = 'asc' | 'desc';
+
+/** 排序字段：取值函数或属性名，可带排序方向 */
+export interface SortField<T> {
+  key: ((item: T) => unknown) | keyof T;
+  order?: SortOrder;
+}
+
 /**
- * 按取值函数排序（不修改原数组）
- * @param selector 取值函数
- * @param order 排序方向，默认 `'asc'`
+ * 排序（不修改原数组）
+ * @param arr 源数组
+ * @param criteria 单个取值函数 / 属性名，或字段数组（多字段依次比较）
+ * @param order 单字段时的排序方向，默认 `'asc'`
  * @example
  * sortBy([3, 1, 2], item => item); // [1, 2, 3]
- * sortBy([{ n: 1 }, { n: 3 }], item => item.n, 'desc'); // [{ n: 3 }, { n: 1 }]
+ * sortBy([{ n: 1 }, { n: 3 }], 'n', 'desc'); // [{ n: 3 }, { n: 1 }]
+ * sortBy(list, ['age', { key: 'name', order: 'desc' }]); // 多字段
  */
-export const sortBy = <T>(
+export function sortBy<T>(arr: readonly T[], criteria: ((item: T) => unknown) | keyof T, order?: SortOrder): T[];
+export function sortBy<T>(
   arr: readonly T[],
-  selector: (item: T) => unknown,
-  order: 'asc' | 'desc' = 'asc',
-): T[] => {
-  const direction = order === 'desc' ? -1 : 1;
-  return [...arr].sort((a, b) => compareValues(selector(a), selector(b)) * direction);
-};
+  criteria: ReadonlyArray<SortField<T> | ((item: T) => unknown) | keyof T>,
+): T[];
+export function sortBy<T>(
+  arr: readonly T[],
+  criteria: ((item: T) => unknown) | keyof T | ReadonlyArray<SortField<T> | ((item: T) => unknown) | keyof T>,
+  order: SortOrder = 'asc',
+): T[] {
+  const fields: Array<{ get: (item: T) => unknown; order: SortOrder }> = Array.isArray(criteria)
+    ? (criteria as ReadonlyArray<SortField<T> | ((item: T) => unknown) | keyof T>).map(field =>
+        typeof field === 'object' && field !== null
+          ? { get: toGetter<T, unknown>(field.key), order: field.order ?? 'asc' }
+          : { get: toGetter<T, unknown>(field), order: 'asc' },
+      )
+    : [{ get: toGetter<T, unknown>(criteria as ((item: T) => unknown) | keyof T), order }];
+  return [...arr].sort((a, b) => {
+    for (const field of fields) {
+      const diff = compareValues(field.get(a), field.get(b));
+      if (diff !== 0) return diff * (field.order === 'desc' ? -1 : 1);
+    }
+    return 0;
+  });
+}
 
 /**
  * 去除假值（`null` / `undefined` / `false` / `0` / `''` / `NaN`）
@@ -279,4 +319,96 @@ export function zip<T extends ReadonlyArray<ReadonlyArray<unknown>>>(...arrays: 
     result.push(arrays.map(arr => arr[i]));
   }
   return result as unknown as Zipped<T>;
+}
+
+const extremumBy = <T>(
+  arr: readonly T[],
+  iteratee: ((item: T) => unknown) | keyof T,
+  direction: 1 | -1,
+): T | undefined => {
+  const getValue = toGetter<T, unknown>(iteratee);
+  let result: T | undefined;
+  let best: unknown;
+  for (const item of arr) {
+    const value = getValue(item);
+    if (result === undefined || compareValues(value, best) * direction > 0) {
+      result = item;
+      best = value;
+    }
+  }
+  return result;
+};
+
+/**
+ * 按 key 建索引（相同 key 后者覆盖前者，类似 lodash `keyBy`）
+ * @param arr 源数组
+ * @param iteratee 取值函数，或属性名（lodash 简写）
+ * @example
+ * keyBy([{ id: 'a', v: 1 }, { id: 'b', v: 2 }], 'id');
+ * // { a: { id: 'a', v: 1 }, b: { id: 'b', v: 2 } }
+ */
+export function keyBy<T, K extends PropertyKey>(arr: readonly T[], iteratee: (item: T) => K): Record<K, T>;
+export function keyBy<T, K extends keyof T>(arr: readonly T[], iteratee: K): Record<Extract<T[K], PropertyKey>, T>;
+export function keyBy<T>(arr: readonly T[], iteratee: ((item: T) => PropertyKey) | keyof T): Record<PropertyKey, T> {
+  const getKey = toGetter<T, PropertyKey>(iteratee);
+  const result: Record<PropertyKey, T> = {};
+  for (const item of arr) setOwn(result, getKey(item), item);
+  return result;
+}
+
+/**
+ * 统计各 key 出现次数（类似 lodash `countBy`）
+ * @param arr 源数组
+ * @param iteratee 取值函数，或属性名（lodash 简写）
+ * @example
+ * countBy([{ t: 'a' }, { t: 'b' }, { t: 'a' }], 't'); // { a: 2, b: 1 }
+ */
+export function countBy<T, K extends PropertyKey>(arr: readonly T[], iteratee: (item: T) => K): Record<K, number>;
+export function countBy<T, K extends keyof T>(
+  arr: readonly T[],
+  iteratee: K,
+): Record<Extract<T[K], PropertyKey>, number>;
+export function countBy<T>(
+  arr: readonly T[],
+  iteratee: ((item: T) => PropertyKey) | keyof T,
+): Record<PropertyKey, number> {
+  const getKey = toGetter<T, PropertyKey>(iteratee);
+  const result: Record<PropertyKey, number> = {};
+  for (const item of arr) {
+    const key = getKey(item);
+    setOwn(result, key, (hasOwn(result, key) ? result[key] : 0) + 1);
+  }
+  return result;
+}
+
+/**
+ * 取取值最大的一项（空数组返回 `undefined`，类似 lodash `maxBy`）
+ * @example
+ * maxBy([{ n: 1 }, { n: 3 }], 'n'); // { n: 3 }
+ */
+export function maxBy<T>(arr: readonly T[], iteratee: ((item: T) => unknown) | keyof T): T | undefined {
+  return extremumBy(arr, iteratee, 1);
+}
+
+/**
+ * 取取值最小的一项（空数组返回 `undefined`，类似 lodash `minBy`）
+ * @example
+ * minBy([{ n: 1 }, { n: 3 }], 'n'); // { n: 1 }
+ */
+export function minBy<T>(arr: readonly T[], iteratee: ((item: T) => unknown) | keyof T): T | undefined {
+  return extremumBy(arr, iteratee, -1);
+}
+
+/**
+ * 按条件拆成两组 `[命中, 未命中]`（类似 lodash `partition`）
+ * @example
+ * partition([1, 2, 3, 4], n => n % 2 === 0); // [[2, 4], [1, 3]]
+ */
+export function partition<T>(arr: readonly T[], predicate: (item: T, index: number) => boolean): [T[], T[]] {
+  const pass: T[] = [];
+  const fail: T[] = [];
+  arr.forEach((item, index) => {
+    (predicate(item, index) ? pass : fail).push(item);
+  });
+  return [pass, fail];
 }

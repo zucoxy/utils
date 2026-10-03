@@ -4,7 +4,8 @@ Commonly used JS/TS utils —— 框架无关，浏览器 / Node 双端可用，
 
 ## 环境要求
 
-- Node.js >= 22.20.0
+- **使用方**：Node.js >= 18.18.0（产物为 ES2022；`crypto` 不可用时 `randomString` / `uuid` 自动降级为 `Math.random`）
+- **本地开发 / 发布**：Node.js >= 22.20.0（由 eslint / bumpp 等开发依赖决定）
 - 包管理器：pnpm
 
 ## 安装
@@ -42,7 +43,7 @@ getMessages('en-US').date.justNow; // 'just now'
 
 - **base**：`assert` `toString` `getTypeName`
 - **is**：`isDef` `isBoolean` `isFunction` `isNumber` `isString` `isObject` `isUndefined` `isNull` `isSymbol` `isRegExp` `isDate` `isFile` `isError` `isMap` `isSet` `isArray` `isWindow` `isBrowser`
-- **array**：`arrayToOption` `arrayToTree` `unique` `uniqueBy` `chunk` `groupBy` `sortBy` `compact` `difference` `intersection` `union` `shuffle` `sample` `range` `sumBy` `mean` `first` `last` `zip`
+- **array**：`arrayToOption` `arrayToTree` `unique` `uniqueBy` `chunk` `groupBy` `keyBy` `countBy` `sortBy` `maxBy` `minBy` `partition` `compact` `difference` `intersection` `union` `shuffle` `sample` `range` `sumBy` `mean` `first` `last` `zip`
 - **object**：`deepMerge` `mergeWith` `yamlToObj` `objectToOption` `pick` `omit` `getByPath` `setByPath` `hasPath` `isEmpty` `invert` `mapValues` `mapKeys` `isEqual`
 - **number**：`clamp` `inRange` `lerp` `roundTo` `ceilTo` `floorTo` `toFixed` `thousands` `formatFileSize` `randomInt` `randomFloat` `isEven` `isOdd` `percentage`
 - **date**：`formatDate` `getWeek` `formatPast` `formatAxis` `createTimeUnitListByTimeRange`（均支持 `locale`）

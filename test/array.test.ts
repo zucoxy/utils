@@ -4,12 +4,17 @@ import {
   arrayToTree,
   chunk,
   compact,
+  countBy,
   difference,
   first,
   groupBy,
   intersection,
+  keyBy,
   last,
+  maxBy,
   mean,
+  minBy,
+  partition,
   range,
   sample,
   shuffle,
@@ -99,8 +104,12 @@ describe('uniqueness', () => {
     expect(unique([1, 1, 2, 3, 3])).toEqual([1, 2, 3]);
   });
 
-  it('uniqueBy', () => {
+  it('uniqueBy 支持取值函数', () => {
     expect(uniqueBy([{ id: 1 }, { id: 1 }, { id: 2 }], item => item.id)).toEqual([{ id: 1 }, { id: 2 }]);
+  });
+
+  it('uniqueBy 支持属性名', () => {
+    expect(uniqueBy([{ id: 1 }, { id: 1 }, { id: 2 }], 'id')).toEqual([{ id: 1 }, { id: 2 }]);
   });
 });
 
@@ -127,6 +136,28 @@ describe('sortBy / compact', () => {
   it('sortBy 升序与降序', () => {
     expect(sortBy([3, 1, 2], item => item)).toEqual([1, 2, 3]);
     expect(sortBy([{ n: 1 }, { n: 3 }, { n: 2 }], item => item.n, 'desc')).toEqual([{ n: 3 }, { n: 2 }, { n: 1 }]);
+  });
+
+  it('sortBy 支持属性名', () => {
+    expect(sortBy([{ n: 1 }, { n: 3 }, { n: 2 }], 'n')).toEqual([{ n: 1 }, { n: 2 }, { n: 3 }]);
+  });
+
+  it('sortBy 支持多字段（含各自方向）', () => {
+    const list = [
+      { a: 1, b: 1 },
+      { a: 1, b: 2 },
+      { a: 0, b: 3 },
+    ];
+    expect(sortBy(list, ['a', 'b'])).toEqual([
+      { a: 0, b: 3 },
+      { a: 1, b: 1 },
+      { a: 1, b: 2 },
+    ]);
+    expect(sortBy(list, [{ key: 'a', order: 'desc' }, 'b'])).toEqual([
+      { a: 1, b: 1 },
+      { a: 1, b: 2 },
+      { a: 0, b: 3 },
+    ]);
   });
 
   it('compact 去除假值', () => {
@@ -198,5 +229,42 @@ describe('zip', () => {
       [2, 4, 6],
     ]);
     expect(zip()).toEqual([]);
+  });
+});
+
+describe('keyBy / countBy', () => {
+  it('keyBy 建索引', () => {
+    expect(keyBy([{ id: 'a', v: 1 }, { id: 'b', v: 2 }], 'id')).toEqual({
+      a: { id: 'a', v: 1 },
+      b: { id: 'b', v: 2 },
+    });
+  });
+
+  it('countBy 计数', () => {
+    expect(countBy([{ t: 'a' }, { t: 'b' }, { t: 'a' }], 't')).toEqual({ a: 2, b: 1 });
+  });
+});
+
+describe('maxBy / minBy / partition', () => {
+  it('maxBy / minBy', () => {
+    const list = [{ n: 1 }, { n: 3 }, { n: 2 }];
+    expect(maxBy(list, 'n')).toEqual({ n: 3 });
+    expect(minBy(list, 'n')).toEqual({ n: 1 });
+    expect(maxBy([] as Array<{ n: number }>, 'n')).toBeUndefined();
+  });
+
+  it('partition', () => {
+    expect(partition([1, 2, 3, 4], n => n % 2 === 0)).toEqual([[2, 4], [1, 3]]);
+  });
+});
+
+describe('原型污染加固', () => {
+  it('groupBy 遇到 __proto__ key 不污染原型', () => {
+    const protoKey = '__proto__';
+    const result = groupBy([{ k: protoKey }, { k: protoKey }], 'k');
+    expect(Object.keys(result)).toEqual([protoKey]);
+    expect(result[protoKey]).toHaveLength(2);
+    expect(Object.getPrototypeOf(result)).toBe(Object.prototype);
+    expect(({} as Record<string, unknown>).polluted).toBeUndefined();
   });
 });
