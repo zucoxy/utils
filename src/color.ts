@@ -1,8 +1,12 @@
 import type { HSV, RGB, RGBA } from './types';
 
 /**
- * 随机颜色
- * @param type - 'rgb' | 'hex' | 'hsl'
+ * 生成随机颜色
+ * @param type 返回格式：`'rgb'` | `'hex'` | `'hsl'`，默认 `'hex'`
+ * @returns 对应格式的颜色字符串
+ * @example
+ * randomColor(); // '#1a2b3c'
+ * randomColor('rgb'); // 'rgb(26, 43, 60)'
  */
 export function randomColor(type: 'rgb' | 'hex' | 'hsl' = 'hex'): string {
   // 生成红、绿、蓝三个分量的随机值
@@ -30,13 +34,13 @@ export function randomColor(type: 'rgb' | 'hex' | 'hsl' = 'hex'): string {
 }
 
 /**
- * hsv2rgb
- * @param h
- * @param s
- * @param v
+ * HSV 转 RGB
+ * @returns `{ r, g, b }`，各分量 0-255
+ * @example
+ * hsv2rgb(0, 1, 1); // { r: 255, g: 0, b: 0 }
  */
 export function hsv2rgb(h: number, s: number, v: number): RGB {
-  h === 360 && (h = 0);
+  if (h === 360) h = 0;
   const i = Math.floor(h / 60) % 6;
   const f = h / 60 - i;
   const p = v * (1 - s);
@@ -49,23 +53,28 @@ export function hsv2rgb(h: number, s: number, v: number): RGB {
     r = v;
     g = t;
     b = p;
-  } else if (i === 1) {
+  }
+  else if (i === 1) {
     r = q;
     g = v;
     b = p;
-  } else if (i === 2) {
+  }
+  else if (i === 2) {
     r = p;
     g = v;
     b = t;
-  } else if (i === 3) {
+  }
+  else if (i === 3) {
     r = p;
     g = q;
     b = v;
-  } else if (i === 4) {
+  }
+  else if (i === 4) {
     r = t;
     g = p;
     b = v;
-  } else if (i === 5) {
+  }
+  else if (i === 5) {
     r = v;
     g = p;
     b = q;
@@ -77,10 +86,10 @@ export function hsv2rgb(h: number, s: number, v: number): RGB {
 }
 
 /**
- * rgb2hsv
- * @param r
- * @param g
- * @param b
+ * RGB 转 HSV
+ * @returns `{ h, s, v }`，h 为 0-360，s/v 为 0-1
+ * @example
+ * rgb2hsv(255, 0, 0); // { h: 0, s: 1, v: 1 }
  */
 export function rgb2hsv(r: number, g: number, b: number): HSV {
   const r1 = r / 255;
@@ -94,16 +103,20 @@ export function rgb2hsv(r: number, g: number, b: number): HSV {
   let v = 0;
   if (d === 0) {
     h = 0;
-  } else if (cmax === r1) {
+  }
+  else if (cmax === r1) {
     h = ((60 * (g1 - b1)) / d + 360) % 360;
-  } else if (cmax === g1) {
+  }
+  else if (cmax === g1) {
     h = 60 * ((b1 - r1) / d + 2);
-  } else if (cmax === b1) {
+  }
+  else if (cmax === b1) {
     h = 60 * ((r1 - g1) / d + 4);
   }
   if (cmax === 0) {
     s = 0;
-  } else {
+  }
+  else {
     s = d / cmax;
   }
   v = cmax;
@@ -114,31 +127,33 @@ export function rgb2hsv(r: number, g: number, b: number): HSV {
 }
 
 /**
- * rgba2hex
- * @param r
- * @param g
- * @param b
- * @param a
+ * RGBA 转 Hex
+ * @param r 红 0-255
+ * @param g 绿 0-255
+ * @param b 蓝 0-255
+ * @param a 透明度 0-1，默认 1；小于 1 时输出 8 位 hex
+ * @example
+ * rgba2hex(255, 0, 0); // '#FF0000'
+ * rgba2hex(255, 0, 0, 0.5); // '#FF000080'
  */
-export function rgba2hex(r: any, g: any, b: any, a = 1): string {
-  r = parseInt(r);
-  const r1 = r.toString(16).length !== 2 ? `0${r.toString(16)}` : r.toString(16);
-  g = parseInt(g);
-  const g1 = g.toString(16).length !== 2 ? `0${g.toString(16)}` : g.toString(16);
-  b = parseInt(b);
-  const b1 = b.toString(16).length !== 2 ? `0${b.toString(16)}` : b.toString(16);
-  a = parseFloat(a.toString());
+export function rgba2hex(r: number, g: number, b: number, a = 1): string {
+  const toHex = (n: number): string => {
+    const hex = Math.trunc(n).toString(16);
+    return hex.length !== 2 ? `0${hex}` : hex;
+  };
   let a1 = '';
   if (a !== 1) {
-    const temp = Math.floor(256 * a);
-    a1 = temp.toString(16).length !== 2 ? `0${temp.toString(16)}` : temp.toString(16);
+    a1 = toHex(Math.floor(256 * a));
   }
-  return `#${r1}${g1}${b1}${a1}`.toUpperCase();
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}${a1}`.toUpperCase();
 }
 
 /**
- * hex2rgba
- * @param s
+ * Hex 转 RGBA（支持 3/4/6/8 位，可省略 `#`）
+ * @param s 16 进制颜色字符串
+ * @example
+ * hex2rgba('#ff0000'); // { r: 255, g: 0, b: 0, a: 1 }
+ * hex2rgba('#f00'); // { r: 255, g: 0, b: 0, a: 1 }
  */
 export function hex2rgba(s: string): RGBA {
   if (/^#?[0-9a-fA-F]{3}$/.test(s)) {
@@ -172,25 +187,27 @@ export function hex2rgba(s: string): RGBA {
 }
 
 /**
- * colorToHsv
- * @param color
+ * 把 hex / RGB / HSV 统一转换为 HSV
+ * @param color `'#rrggbb'` 字符串，或 `{ r, g, b }` / `{ h, s, v }` 对象
+ * @throws {TypeError} 传入不支持的格式时
+ * @example
+ * colorToHsv('#ff0000'); // { h: 0, s: 1, v: 1 }
+ * colorToHsv({ r: 255, g: 0, b: 0 }); // { h: 0, s: 1, v: 1 }
  */
-export function colorToHsv(color: any): { h: number; s: number; v: number } {
+export function colorToHsv(color: string | RGB | HSV): { h: number; s: number; v: number } {
   // 将颜色转换为 RGBA 格式
-  let rgba;
+  let rgba: RGBA;
   if (typeof color === 'string') {
     if (!color.startsWith('#')) {
       throw new TypeError('only support for hex/rgb/hsv');
     }
     rgba = hex2rgba(color);
-  } else if (typeof color === 'object') {
-    if (color.r && color.g && color.b) {
-      rgba = color;
-    } else if (color.h && color.s && color.v) {
-      return color;
-    }
-  } else {
-    throw new TypeError('Invalid color format');
+  }
+  else if ('r' in color) {
+    rgba = { ...color, a: 1 };
+  }
+  else {
+    return { h: color.h, s: color.s, v: color.v };
   }
 
   // 将 RGBA 转换为 HSV
@@ -200,12 +217,14 @@ export function colorToHsv(color: any): { h: number; s: number; v: number } {
 
 /**
  * 颜色变浅
- * @param hex - 16 进制颜色
- * @param ratio - 0-1
+ * @param hex 16 进制颜色
+ * @param ratio 变浅比例 0-1
+ * @example
+ * colorLighten('#000000', 0.5); // '#808080'
  */
 export function colorLighten(hex: string, ratio: number): string {
   let { r, g, b, a } = hex2rgba(hex);
-  let a1;
+  let a1 = '';
   a = parseFloat(a.toString());
   if (a !== 1) {
     const temp = Math.floor(256 * a);
@@ -228,14 +247,16 @@ export function colorLighten(hex: string, ratio: number): string {
 
 /**
  * 颜色加深
- * @param hex - 16 进制颜色
- * @param ratio - 0-1
+ * @param hex 16 进制颜色
+ * @param ratio 加深比例 0-1
+ * @example
+ * colorDarken('#ffffff', 0.5); // '#808080'
  */
 export function colorDarken(hex: string, ratio: number): string {
   let { r, g, b, a } = hex2rgba(hex);
 
   // 处理透明度
-  let a1;
+  let a1 = '';
   a = parseFloat(a.toString());
   if (a !== 1) {
     const temp = Math.floor(256 * a);
@@ -258,12 +279,14 @@ export function colorDarken(hex: string, ratio: number): string {
 }
 
 /**
- * 计算 rgb 的亮度 Y，Y 值小于 128 则认为是深色，大于等于 128 则认为是浅色
- * @param color - hex 十六进制颜色
- * @return boolean
+ * 判断颜色是否为深色（相对亮度 Y < 128）
+ * @param color 16 进制颜色
+ * @example
+ * isDarkColor('#000000'); // true
+ * isDarkColor('#ffffff'); // false
  */
 export function isDarkColor(color: string) {
-  const { r, g, b, a } = hex2rgba(color);
+  const { r, g, b } = hex2rgba(color);
 
   // 计算相对亮度
   const y = 0.299 * r + 0.587 * g + 0.114 * b;

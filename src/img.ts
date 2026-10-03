@@ -1,30 +1,35 @@
 import { isFile } from './is';
 
-const fileToDataURL = (blob: Blob): Promise<any> => {
-  return new Promise(resolve => {
+const fileToDataURL = (blob: Blob): Promise<string> => {
+  return new Promise<string>(resolve => {
     const reader = new FileReader();
-    reader.onloadend = e => resolve((e.target as FileReader).result);
+    reader.onloadend = e => resolve((e.target as FileReader).result as string);
     reader.readAsDataURL(blob);
   });
 };
+
 const dataURLToImage = (dataURL: string): Promise<HTMLImageElement> => {
-  return new Promise(resolve => {
+  return new Promise<HTMLImageElement>(resolve => {
     const img = new Image();
     img.onload = () => resolve(img);
     img.src = dataURL;
   });
 };
+
 const canvasToBlob = (canvas: HTMLCanvasElement, type: string, quality: number): Promise<Blob | null> => {
-  return new Promise(resolve => canvas.toBlob(blob => resolve(blob), type, quality));
+  return new Promise<Blob | null>(resolve => canvas.toBlob(blob => resolve(blob), type, quality));
 };
+
 /**
- * 图片压缩方法
- * @param {Object}  imgFile 图片文件
- * @param {Number} quality 压缩质量参数 0-1
- * @param {String} imgType 想压缩成的文件类型
- * @returns 压缩后的新图片
+ * 图片压缩（基于 canvas，需浏览器环境）
+ * @param imgFile 图片文件
+ * @param imgType 目标类型，如 `'image/jpeg'`，为空时取源文件类型
+ * @param quality 压缩质量 0-1，默认 0.5
+ * @returns 压缩后的新 `File`；入参不是 `File` 时原样返回
+ * @example
+ * const file = await compressionImage(input.files[0], 'image/jpeg', 0.6);
  */
-export const compressionImage = async (imgFile: File, imgType: string, quality = 0.5) => {
+export const compressionImage = async (imgFile: File, imgType: string, quality = 0.5): Promise<File> => {
   if (!isFile(imgFile)) {
     console.warn('type Error: imgFile excepted to be File');
     return imgFile;
@@ -39,8 +44,8 @@ export const compressionImage = async (imgFile: File, imgType: string, quality =
   canvas.height = image.height;
   context.clearRect(0, 0, image.width, image.height);
   context.drawImage(image, 0, 0, image.width, image.height);
-  const blob = (await canvasToBlob(canvas, toType, quality)) as Blob; // quality:0.5可根据实际情况计算
+  const blob = (await canvasToBlob(canvas, toType, quality)) as Blob;
   return new File([blob], fileName, {
-    type: toType
+    type: toType,
   });
 };
